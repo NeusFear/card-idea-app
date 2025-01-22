@@ -1,29 +1,32 @@
 "use client";
 import {useEffect, useState} from "react";
+import {ObjectId} from "bson";
 
-interface Card {
-    _id: string,
+interface NewCard {
     desc: string,
     submitter: string
 }
 
 export default function Home() {
 
-    const [tab, setTab] = useState("missions");
+    const [tab, setTab] = useState("mission");
     const [input, setInput] = useState("");
-    const [missions, setMissions] = useState<string[]>([]);
-    const [items, setItems] = useState<string[]>([]);
+    const [submitterName, setSubmitterName] = useState("");
+    const [missions, setMissions] = useState<NewCard[]>([]);
+    const [items, setItems] = useState<NewCard[]>([]);
 
     const addMission = () => {
+        if (submitterName == "") return alert("Please include your first name in the Your Name field.")
         if (input.trim() !== "") {
-            setMissions([...missions, input]); // Add the new item to the array
+            setMissions([...missions, { desc: input, submitter: submitterName }]); // Add the new item to the array
             setInput(""); // Clear the input field
         }
     };
 
     const addItem = () => {
+        if (submitterName == "") return alert("Please include your first name in the Your Name field.")
         if (input.trim() !== "") {
-            setItems([...items, input]); // Add the new item to the array
+            setItems([...items, { desc: input, submitter: submitterName }]); // Add the new item to the array
             setInput(""); // Clear the input field
         }
     };
@@ -32,12 +35,12 @@ export default function Home() {
         const fetchMissions = async () => {
             try {
                 const response = await fetch("/api/missions");
-                if (!response.ok) throw new Error("Failed to fetch missions");
+                if (!response.ok) throw new Error("Failed to fetch add_mission");
                 const data = await response.json();
                 setMissions(data);
                 console.log(data);
             } catch (error) {
-                console.error("Error fetching missions: " + error);
+                console.error("Error fetching add_mission: " + error);
             }
         };
 
@@ -51,15 +54,16 @@ export default function Home() {
                 <p className="text-xl text-neutral-300 pl-2">Submit your ideas below, as many as you like!</p>
             </header>
             <nav className="bg-gray-900 text-white px-14 pt-4 flex flex-row gap-x-4 border-b">
-                <Tab title={"Missions"} active={tab == "missions"} onClick={() => setTab("missions")} />
+                <Tab title={"Missions"} active={tab == "mission"} onClick={() => setTab("mission")} />
                 <Tab title={"Items"} active={tab == "items"} onClick={() => setTab("items")} />
             </nav>
             <main className="items-center flex-grow">
                 <div className={"bg-gray-700 p-3 flex flex-row"}>
-                    <input type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "missions" ? "Mission Idea" : "Item Idea"} />
-                    <button onClick={tab == "missions" ? addMission : addItem} className={"rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold cursor-pointer"} >Submit</button>
+                    <input type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
+                    <input type="text" onChange={(event) => setSubmitterName(event.target.value)} value={submitterName} className={"border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
+                    <button onClick={tab == "mission" ? addMission : addItem} className={(submitterName == "" ? "cursor-not-allowed" : "cursor-pointer") + " rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold"} >Submit</button>
                 </div>
-                {tab == "missions" && <Cards cards={missions}/>}
+                {tab == "mission" && <Cards cards={missions}/>}
                 {tab == "items" && <Cards cards={items}/>}
             </main>
             <footer className="bg-gray-800 text-center text-white p-8">
@@ -83,7 +87,7 @@ function Tab({ title, active, onClick }: { title: string, active: boolean, onCli
     )
 }
 
-function Cards({ cards }: { cards: string[] }) {
+function Cards({ cards }: { cards: NewCard[] }) {
 
     return (
         <div className="flex flex-row flex-wrap p-4 gap-4 text-center">
@@ -94,10 +98,11 @@ function Cards({ cards }: { cards: string[] }) {
     );
 }
 
-function Card({ card }: { card: string }) {
+function Card({ card }: { card: NewCard }) {
     return (
         <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center">
-            <p className="text-white font-semibold text-2xl capitalize">{card}</p>
+            <p className="text-white font-semibold text-2xl capitalize">{card.desc}</p>
+            <p className="text-gray-400 capitalize absolute bottom-1 p-2">Submitted by: {card.submitter}</p>
         </div>
     )
 }
