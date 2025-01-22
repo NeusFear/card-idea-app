@@ -1,101 +1,103 @@
-import Image from "next/image";
+"use client";
+import {useEffect, useState} from "react";
+
+interface Card {
+    _id: string,
+    desc: string,
+    submitter: string
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    const [tab, setTab] = useState("missions");
+    const [input, setInput] = useState("");
+    const [missions, setMissions] = useState<string[]>([]);
+    const [items, setItems] = useState<string[]>([]);
+
+    const addMission = () => {
+        if (input.trim() !== "") {
+            setMissions([...missions, input]); // Add the new item to the array
+            setInput(""); // Clear the input field
+        }
+    };
+
+    const addItem = () => {
+        if (input.trim() !== "") {
+            setItems([...items, input]); // Add the new item to the array
+            setInput(""); // Clear the input field
+        }
+    };
+
+    useEffect(() => {
+        const fetchMissions = async () => {
+            try {
+                const response = await fetch("/api/missions");
+                if (!response.ok) throw new Error("Failed to fetch missions");
+                const data = await response.json();
+                setMissions(data);
+                console.log(data);
+            } catch (error) {
+                console.error("Error fetching missions: " + error);
+            }
+        };
+
+        fetchMissions();
+    }, []);
+
+    return (
+        <div className="flex flex-col min-h-screen">
+            <header className="bg-gray-800 px-8 py-16">
+                <h1 className="text-6xl font-bold text-white">Card Idea Generator</h1>
+                <p className="text-xl text-neutral-300 pl-2">Submit your ideas below, as many as you like!</p>
+            </header>
+            <nav className="bg-gray-900 text-white px-14 pt-4 flex flex-row gap-x-4 border-b">
+                <Tab title={"Missions"} active={tab == "missions"} onClick={() => setTab("missions")} />
+                <Tab title={"Items"} active={tab == "items"} onClick={() => setTab("items")} />
+            </nav>
+            <main className="items-center flex-grow">
+                <div className={"bg-gray-700 p-3 flex flex-row"}>
+                    <input type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "missions" ? "Mission Idea" : "Item Idea"} />
+                    <button onClick={tab == "missions" ? addMission : addItem} className={"rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold cursor-pointer"} >Submit</button>
+                </div>
+                {tab == "missions" && <Cards cards={missions}/>}
+                {tab == "items" && <Cards cards={items}/>}
+            </main>
+            <footer className="bg-gray-800 text-center text-white p-8">
+                Thanks for helping me come up with card ideas!
+            </footer>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
+}
+
+function Tab({ title, active, onClick }: { title: string, active: boolean, onClick: () => void }) {
+    return (
+        <div
+            className={(
+                active ?
+                "bg-gray-700 text-white border-white transform translate-y-[1px]" : //Active tab styles
+                "bg-gray-800 text-neutral-400 border-neutral-600") + //Inactive tab styles
+                " border-t border-x px-4 py-1 rounded-t-xl cursor-pointer"} //Common tab styles
+            onClick={onClick}>
+            {title}
+        </div>
+    )
+}
+
+function Cards({ cards }: { cards: string[] }) {
+
+    return (
+        <div className="flex flex-row flex-wrap p-4 gap-4 text-center">
+            {cards.map((card, index) => (
+                <Card key={index} card={card}/>
+            ))}
+        </div>
+    );
+}
+
+function Card({ card }: { card: string }) {
+    return (
+        <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center">
+            <p className="text-white font-semibold text-2xl capitalize">{card}</p>
+        </div>
+    )
 }
