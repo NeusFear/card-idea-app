@@ -48,7 +48,7 @@ export default function Home() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen overflow-x-hidden">
             <header className="bg-gray-800 px-8 py-16">
                 <h1 className="text-6xl font-bold text-white">Card Idea Generator</h1>
                 <p className="text-xl text-neutral-300 pl-2">Submit your ideas below, as many as you like!</p>
@@ -58,10 +58,15 @@ export default function Home() {
                 <Tab title={"Items"} active={tab == "items"} onClick={() => setTab("items")} />
             </nav>
             <main className="items-center flex-grow">
-                <form className={"bg-gray-700 p-3 flex flex-row"}>
-                    <input required type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
-                    <input required type="text" onChange={(event) => setSubmitterName(event.target.value)} value={submitterName} className={"border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
-                    <button onClick={handleSubmit} className={(submitterName == "" ? "cursor-not-allowed" : "cursor-pointer") + " rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold"} >Submit</button>
+                <form className={"bg-gray-700 p-3 flex md:flex-row flex-col md:gap-0 gap-2"}>
+                    <input required type="text"
+                           onChange={(event) => setInput(event.target.value)} value={input}
+                           className={"md:rounded-l-xl md:rounded-none rounded-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
+                    <input required type="text"
+                           onChange={(event) => setSubmitterName(event.target.value)} value={submitterName}
+                           className={"md:rounded-none rounded-xl md:border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
+                    <button onClick={handleSubmit}
+                            className={(submitterName == "" ? "cursor-not-allowed" : "cursor-pointer") + " md:rounded-r-xl md:rounded-none rounded-xl py-4 px-16 bg-gray-800 text-white font-semibold"} >Submit</button>
                 </form>
                 {tab == "missions" && <Cards route="/api/get_missions" setCards={setMissions} cards={missions} />}
                 {tab == "items" && <Cards route="/api/get_items" setCards={setItems} cards={items} />}
@@ -80,7 +85,7 @@ function Tab({ title, active, onClick }: { title: string, active: boolean, onCli
                 active ?
                 "bg-gray-700 text-white border-white transform translate-y-[1px]" : //Active tab styles
                 "bg-gray-800 text-neutral-400 border-neutral-600") + //Inactive tab styles
-                " border-t border-x px-4 py-1 rounded-t-xl cursor-pointer"} //Common tab styles
+                " border-t border-x px-4 py-1 rounded-t-xl cursor-pointer md:flex-grow-0 flex-grow text-center"} //Common tab styles
             onClick={onClick}>
             {title}
         </div>
@@ -115,7 +120,7 @@ function Cards({ route, setCards, cards }: { route: string, setCards: (cards: Ne
         );
     } else {
         return (
-            <div className="flex flex-row flex-wrap p-4 gap-4 text-center">
+            <div className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
                 {cards.map((card, index) => (
                     <Card key={index} card={card}/>
                 ))}
@@ -126,9 +131,9 @@ function Cards({ route, setCards, cards }: { route: string, setCards: (cards: Ne
 
 function Card({ card }: { card: NewCard }) {
     return (
-        <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center">
-            <p className="text-white font-semibold text-2xl">{card.desc}</p>
-            <p className="text-gray-400 capitalize absolute bottom-1 p-2">Submitted by: {card.submitter}</p>
+        <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center flex flex-col">
+            <p className="text-white font-semibold text-2xl flex-grow content-center">{card.desc}</p>
+            <p className="text-gray-400 capitalize p-2">Submitted by: {card.submitter}</p>
         </div>
     )
 }
