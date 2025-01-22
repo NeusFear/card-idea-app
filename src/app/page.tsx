@@ -1,6 +1,5 @@
 "use client";
-import {useEffect, useState} from "react";
-import {ObjectId} from "bson";
+import React, {useEffect, useState} from "react";
 
 interface NewCard {
     desc: string,
@@ -9,43 +8,44 @@ interface NewCard {
 
 export default function Home() {
 
-    const [tab, setTab] = useState("mission");
+    //UI Tab state
+    const [tab, setTab] = useState("missions");
+    //Current Input State (common)
     const [input, setInput] = useState("");
     const [submitterName, setSubmitterName] = useState("");
+
+    //Cards state
     const [missions, setMissions] = useState<NewCard[]>([]);
     const [items, setItems] = useState<NewCard[]>([]);
 
-    const addMission = () => {
-        if (submitterName == "") return alert("Please include your first name in the Your Name field.")
-        if (input.trim() !== "") {
-            setMissions([...missions, { desc: input, submitter: submitterName }]); // Add the new item to the array
-            setInput(""); // Clear the input field
-        }
-    };
+    const handleSubmit = async (event: React.FormEvent) => {
 
-    const addItem = () => {
-        if (submitterName == "") return alert("Please include your first name in the Your Name field.")
-        if (input.trim() !== "") {
-            setItems([...items, { desc: input, submitter: submitterName }]); // Add the new item to the array
-            setInput(""); // Clear the input field
-        }
-    };
+        event.preventDefault();
 
-    useEffect(() => {
-        const fetchMissions = async () => {
-            try {
-                const response = await fetch("/api/missions");
-                if (!response.ok) throw new Error("Failed to fetch add_mission");
-                const data = await response.json();
-                setMissions(data);
-                console.log(data);
-            } catch (error) {
-                console.error("Error fetching add_mission: " + error);
+        if (!(tab == "missions" || tab == "items")) return alert("Please select a tab.");
+        if (submitterName == "") return alert("Please include your first name in the Your Name field.")
+        if (input == "") return alert("Please include some text to place on the card.")
+
+        const newData = { submitter: submitterName, desc: input };
+
+        try {
+            const response = await fetch(tab == "missions" ? "/api/add_mission" : "/api/add_item", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newData),
+            });
+
+            if (response.ok) {
+                if (tab == "missions") setMissions([...missions, newData]); // Add the new item to the array
+                if (tab == "items") setItems([...items, newData]); // Add the new item to the array
+                setInput(""); // Clear the input field
+            } else {
+                throw new Error('Failed to add data');
             }
-        };
-
-        fetchMissions();
-    }, []);
+        } catch (error) {
+            console.error('Error adding data:', error);
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -54,17 +54,17 @@ export default function Home() {
                 <p className="text-xl text-neutral-300 pl-2">Submit your ideas below, as many as you like!</p>
             </header>
             <nav className="bg-gray-900 text-white px-14 pt-4 flex flex-row gap-x-4 border-b">
-                <Tab title={"Missions"} active={tab == "mission"} onClick={() => setTab("mission")} />
+                <Tab title={"Missions"} active={tab == "missions"} onClick={() => setTab("missions")} />
                 <Tab title={"Items"} active={tab == "items"} onClick={() => setTab("items")} />
             </nav>
             <main className="items-center flex-grow">
-                <div className={"bg-gray-700 p-3 flex flex-row"}>
-                    <input type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
-                    <input type="text" onChange={(event) => setSubmitterName(event.target.value)} value={submitterName} className={"border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
-                    <button onClick={tab == "mission" ? addMission : addItem} className={(submitterName == "" ? "cursor-not-allowed" : "cursor-pointer") + " rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold"} >Submit</button>
-                </div>
-                {tab == "mission" && <Cards cards={missions}/>}
-                {tab == "items" && <Cards cards={items}/>}
+                <form className={"bg-gray-700 p-3 flex flex-row"}>
+                    <input required type="text" onChange={(event) => setInput(event.target.value)} value={input} className={"rounded-l-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
+                    <input required type="text" onChange={(event) => setSubmitterName(event.target.value)} value={submitterName} className={"border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
+                    <button onClick={handleSubmit} className={(submitterName == "" ? "cursor-not-allowed" : "cursor-pointer") + " rounded-r-xl py-4 px-16 bg-gray-800 text-white font-semibold"} >Submit</button>
+                </form>
+                {tab == "missions" && <Cards route="/api/get_missions" setCards={setMissions} cards={missions} />}
+                {tab == "items" && <Cards route="/api/get_items" setCards={setItems} cards={items} />}
             </main>
             <footer className="bg-gray-800 text-center text-white p-8">
                 Thanks for helping me come up with card ideas!
@@ -87,21 +87,47 @@ function Tab({ title, active, onClick }: { title: string, active: boolean, onCli
     )
 }
 
-function Cards({ cards }: { cards: NewCard[] }) {
+function Cards({ route, setCards, cards }: { route: string, setCards: (cards: NewCard[]) => void, cards: NewCard[] }) {
 
-    return (
-        <div className="flex flex-row flex-wrap p-4 gap-4 text-center">
-            {cards.map((card, index) => (
-                <Card key={index} card={card}/>
-            ))}
-        </div>
-    );
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(route); // Fetch data from API route
+                if (!response.ok) throw new Error('Failed to fetch data');
+                const result = await response.json();
+                console.log("Fetched data: " + result);
+                setCards(result)
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="text-center text-xl mt-32 animate-bounce">Loading...</div>
+        );
+    } else {
+        return (
+            <div className="flex flex-row flex-wrap p-4 gap-4 text-center">
+                {cards.map((card, index) => (
+                    <Card key={index} card={card}/>
+                ))}
+            </div>
+        );
+    }
 }
 
 function Card({ card }: { card: NewCard }) {
     return (
         <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center">
-            <p className="text-white font-semibold text-2xl capitalize">{card.desc}</p>
+            <p className="text-white font-semibold text-2xl">{card.desc}</p>
             <p className="text-gray-400 capitalize absolute bottom-1 p-2">Submitted by: {card.submitter}</p>
         </div>
     )

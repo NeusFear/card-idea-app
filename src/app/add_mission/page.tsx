@@ -41,23 +41,11 @@ export default function HomePage() {
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="desc">Mission</label>
-                    <input
-                        type="text"
-                        id="desc"
-                        value={desc}
-                        onChange={(e) => setDesc(e.target.value)}
-                        required
-                    />
+                    <input type="text" id="desc" value={desc} onChange={(e) => setDesc(e.target.value)} required/>
                 </div>
                 <div>
                     <label htmlFor="value">Your Name</label>
-                    <input
-                        type="text"
-                        id="value"
-                        value={submitter}
-                        onChange={(e) => setSubmitter(e.target.value)}
-                        required
-                    />
+                    <input type="text" id="value" value={submitter} onChange={(e) => setSubmitter(e.target.value)} required/>
                 </div>
                 <button type="submit">Add Data</button>
             </form>
