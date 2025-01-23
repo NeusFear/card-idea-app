@@ -61,7 +61,7 @@ export default function Home() {
                 <form className={"bg-gray-700 p-3 flex md:flex-row flex-col md:gap-0 gap-2"}>
                     <input required type="text"
                            onChange={(event) => setInput(event.target.value)} value={input}
-                           className={"md:rounded-l-xl md:rounded-none rounded-xl p-4 flex-grow cursor-text"} placeholder={tab == "mission" ? "Mission Idea" : "Item Idea"} />
+                           className={"md:rounded-l-xl md:rounded-none rounded-xl p-4 flex-grow cursor-text"} placeholder={tab == "missions" ? "Mission Idea" : "Item Idea"} />
                     <input required type="text"
                            onChange={(event) => setSubmitterName(event.target.value)} value={submitterName}
                            className={"md:rounded-none rounded-xl md:border-l-4 border-gray-800 p-4 flex-grow cursor-text"} placeholder={"Your Name"} />
