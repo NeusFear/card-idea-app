@@ -1,5 +1,6 @@
 "use client";
 import React, {useEffect, useState} from "react";
+import {exportAsImage} from "../../lib/exportAsImage";
 
 interface NewCard {
     desc: string,
@@ -128,6 +129,21 @@ function Rules() {
     );
 }
 
+function Download({numCards}: {numCards: number}) {
+
+    const exportAll = () => {
+        for (let index = 0; index < numCards; index++) {
+            exportAsImage(document.getElementById("card_" + index.toString()), "card_" + index)
+        }
+    }
+
+    return (
+        <button className="text-center text-xl px-20 py-4 bg-gray-800 rounded-xl text-white" onClick={() => exportAll()}>
+            Download {numCards} cards as images
+        </button>
+    );
+}
+
 function Cards({ route, setCards, cards }: { route: string, setCards: (cards: NewCard[]) => void, cards: NewCard[] }) {
 
     const [loading, setLoading] = useState(true);
@@ -156,18 +172,23 @@ function Cards({ route, setCards, cards }: { route: string, setCards: (cards: Ne
         );
     } else {
         return (
-            <div className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
-                {cards.map((card, index) => (
-                    <Card key={index} card={card}/>
-                ))}
+            <div className="flex flex-col">
+                <div className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
+                    {cards.map((card, index) => (
+                        <Card index={index} key={index} card={card}/>
+                    ))}
+                </div>
+                <div className="p-8 text-center">
+                    <Download numCards={cards.length} />
+                </div>
             </div>
         );
     }
 }
 
-function Card({ card }: { card: NewCard }) {
+function Card({ card, index }: { card: NewCard, index: number }) {
     return (
-        <div className="bg-gray-700 p-3 rounded-xl h-[35rem] w-[25rem] content-center flex flex-col">
+        <div className="bg-gray-700 p-3 rounded-xl h-[525px] w-[375px] content-center flex flex-col" id={"card_" + index}>
             <p className="text-white font-semibold text-2xl flex-grow content-center">{card.desc}</p>
             <p className="text-gray-400 capitalize p-2">Submitted by: {card.submitter}</p>
         </div>
