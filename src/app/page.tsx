@@ -173,13 +173,13 @@ function Cards({ route, setCards, cards }: { route: string, setCards: (cards: Ne
     } else {
         return (
             <div className="flex flex-col">
+                <div className="p-8 text-center">
+                    <Download numCards={cards.length} />
+                </div>
                 <div className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
                     {cards.map((card, index) => (
                         <Card index={index} key={index} card={card}/>
                     ))}
-                </div>
-                <div className="p-8 text-center">
-                    <Download numCards={cards.length} />
                 </div>
             </div>
         );
