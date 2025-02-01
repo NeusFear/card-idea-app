@@ -14,7 +14,7 @@ function Rules() {
                 <li>Each player can now discard 2 of their Preparations and exchange them for 2 more from the deck if desired.</li>
                 <li>Once all players are satisfied with their Preparations they are to go one by one starting to the left of the Task Master and explain to the Task Master how they plan to accomplish the task using 3 of their Preparations</li>
                 <li>The Task Master now select which of the players has won the opportunity to complete the task. Give that player the Task card to keep track of points.</li>
-                <li>Play as many rounds as you like, the player with the most Task Cards at the end of the game wins! Take turns being the task master in a clockwise order after each turn.</li>
+                <li>Play as many rounds as you like, the player with the most Task Cards at the end of the game wins! Take turns being the task master in a clockwise order after each turn and get new cards every turn.</li>
             </ul>
         </div>
     );

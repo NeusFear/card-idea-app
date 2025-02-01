@@ -92,7 +92,7 @@ function TaskMasterTest() {
                         <TestCard key={index} card={card} cycleCard={() => setCardRandom(index)}/>
                     ))}
                 </div>
-                <button className="bg-red-400 rounded-xl hover:bg-red-500 w-60 p-2 font-bold text-white" onClick={() => setCardsRandom()}>Refresh Mission</button>
+                <button className="bg-red-400 rounded-xl hover:bg-red-500 w-60 p-2 font-bold text-white mb-10" onClick={() => setCardsRandom()}>Refresh Mission</button>
             </div>
         )
     }
@@ -157,11 +157,11 @@ function PreparerTest() {
         return(
             <div className="flex flex-col overflow-x-hidden gap-4 items-center">
                 <p className="font-bold text-gray-600 text-lg">Click on a card to cycle it for a new one</p>
-                <button className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
+                <div className="flex flex-row flex-wrap p-4 gap-4 justify-center items-center text-center">
                     {cards.map((card, index) => (
                         <TestCard key={index} card={card} cycleCard={() => setCardRandom(index)} />
                     ))}
-                </button>
+                </div>
                 <button className="bg-red-400 rounded-xl hover:bg-red-500 w-60 p-2 font-bold text-white mb-10" onClick={() => setCardsRandom()}>Refresh Cards</button>
             </div>
         )
@@ -170,7 +170,7 @@ function PreparerTest() {
 
 function TestCard({card, cycleCard} : {card: NewCard, cycleCard: () => void} ) {
     return (
-        <button className="group bg-gray-700 lg:hover:-translate-y-6 transition-transform p-3 rounded-xl h-[320px] w-[240px] content-center flex flex-col" onClick={() => cycleCard()}>
+        <button className="group bg-gray-700 lg:hover:-translate-y-6 transition-transform p-3 rounded-xl h-[320px] w-[240px] content-center flex flex-col text-center" onClick={() => cycleCard()}>
             <p className="text-white font-semibold text-2xl flex-grow content-center">{card?.desc}</p>
             <p className="transform translate-y-10 opacity-0 lg:group-hover:opacity-100 transition-opacity">Cycle Card</p>
         </button>
