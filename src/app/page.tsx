@@ -26,8 +26,8 @@ export default function Home() {
             <main className="items-center flex-grow">
                 { tab === "missions" || tab === "items" ? <InputForm tab={tab} missions={missions} setMissions={setMissions} items={items} setItems={setItems} /> : null }
                 {tab == "rules" && <Rules />}
-                {tab == "missions" && <Cards route="/api/get_missions" setCards={setMissions} cards={missions} />}
-                {tab == "items" && <Cards route="/api/get_items" setCards={setItems} cards={items} />}
+                {tab == "missions" && <Cards route="missions" setCards={setMissions} cards={missions} />}
+                {tab == "items" && <Cards route="items" setCards={setItems} cards={items} />}
                 {tab == "test" && <Game />}
             </main>
             <footer className="bg-gray-800 text-center text-white p-8">

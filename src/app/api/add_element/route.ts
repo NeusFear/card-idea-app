@@ -3,12 +3,12 @@ import clientPromise from "../../../../lib/mongodb";
 
 export async function POST(req: Request) {
     try {
-        const { desc, submitter } = await req.json(); // Get data from the request body
+        const { desc, submitter, collectionName } = await req.json(); // Get data from the request body
 
         // Connect to the database
         await clientPromise.connect();
         const db = clientPromise.db('cards');
-        const collection = db.collection('items');
+        const collection = db.collection(collectionName);
 
         // Insert the new document into MongoDB
         const result = await collection.insertOne({ desc, submitter });
