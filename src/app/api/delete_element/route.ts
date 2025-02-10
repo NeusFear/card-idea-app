@@ -3,27 +3,23 @@ import clientPromise from "../../../../lib/mongodb";
 
 export async function POST(req: Request) {
     try {
-        const { type, desc, newDesc } = await req.json(); // Get data from the request body
+        const { type, desc } = await req.json(); // Get data from the request body
 
         // Connect to the database
         await clientPromise.connect();
         const db = clientPromise.db('cards');
         const collection = db.collection(type);
 
-        // Find and update the document
-        const result = await collection.findOneAndUpdate(
-            { desc: desc }, // Find by description
-            { $set: { desc: newDesc } }, // Update the description
-            { returnDocument: 'after' } // Return the updated document
-        );
+        // Find and delete the document
+        const result = await collection.findOneAndDelete({ desc: desc }); // Find by description and delete
 
         if (!result) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ message: 'Document updated successfully', result });
+        return NextResponse.json({ message: 'Document deleted successfully', result });
     } catch (error) {
-        console.error('Error updating document:', error);
+        console.error('Error deleting document:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     } finally {
         await clientPromise.close();

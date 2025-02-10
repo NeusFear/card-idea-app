@@ -98,6 +98,35 @@ function Card({cardType, card, index}: { cardType: string, card: NewCard, index:
         }
     };
 
+    const handleDelete = async (event: React.FormEvent) => {
+
+        event.preventDefault();
+
+        setEditing(false);
+
+        try {
+            const response = await fetch("/api/delete_element", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    type: cardType, // If this card is a mission or an item
+                    desc: description,   // The current description
+                }),
+            });
+
+            const data = await response.json();
+            console.log("Data log: " + data);
+            if (!response.ok) throw new Error('Failed to fetch data: ' + response);
+            setDescription("Deleting...");
+        } catch (error) {
+            console.error("Delete failed:", error);
+        } finally {
+            setDescription("[Deleted]")
+        }
+    };
+
     const cancelEditing = () => {
         setUpdatedDescription("");
         setEditing(false);
@@ -110,6 +139,7 @@ function Card({cardType, card, index}: { cardType: string, card: NewCard, index:
                 currentDesc={description}
                 setUpdatedDescription={setUpdatedDescription}
                 handleUpdate={handleUpdate}
+                handleDelete={handleDelete}
                 cancelEditing={cancelEditing}
             />}
             {!editing && <p className="text-white font-semibold text-2xl flex-grow content-center"
@@ -119,10 +149,11 @@ function Card({cardType, card, index}: { cardType: string, card: NewCard, index:
     )
 }
 
-function EditCardDesc({currentDesc, setUpdatedDescription, handleUpdate, cancelEditing}: {
+function EditCardDesc({currentDesc, setUpdatedDescription, handleUpdate, handleDelete, cancelEditing}: {
     currentDesc: string,
     setUpdatedDescription: (value: (((prevState: string) => string) | string)) => void,
     handleUpdate: (event: React.FormEvent) => Promise<void>,
+    handleDelete: (event: React.FormEvent) => Promise<void>,
     cancelEditing: () => void,
 }) {
 
@@ -152,14 +183,15 @@ function EditCardDesc({currentDesc, setUpdatedDescription, handleUpdate, cancelE
     }, []);
 
     return (
-        <form className="text-white flex-grow content-center flex flex-col items-center ml-6">
+        <form className="text-white flex-grow content-center flex flex-col items-center">
             <textarea ref={textAreaRef} className="text-white font-semibold text-2xl table-cell align-middle flex-grow text-center bg-transparent text-wrap w-full p-10"
                       onKeyDown={handleKeyDown} //Disable enter and instead accept form
                       value={currentText} placeholder="Type a new card description" spellCheck={true}
             onChange={(event) => updateDescFields(event.target.value)}/>
-            <div className="flex flex-row gap-4">
-                <button ref={submitButtonRef} className="h-10 bg-blue-400 rounded-xl p-2 mt-10 font-semibold" onClick={event => handleUpdate(event)}>Update Description</button>
-                <button className="h-10 bg-red-400 rounded-xl p-2 mt-10 font-semibold" onClick={cancelEditing}>Cancel</button>
+            <button ref={submitButtonRef} className="h-10 bg-blue-400 rounded-xl p-2 font-semibold w-full mt-2" onClick={event => handleUpdate(event)}>Update Description</button>
+            <div className="flex flex-row gap-2 mt-2 w-full">
+                <button className="flex-grow h-10 bg-red-600 text-white rounded-xl p-2 font-semibold" onClick={event => handleDelete(event)}>Delete</button>
+                <button className="flex-grow h-10 bg-red-400 rounded-xl p-2 font-semibold" onClick={cancelEditing}>Cancel</button>
             </div>
         </form>
     )
